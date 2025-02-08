@@ -30,6 +30,10 @@ public:
     // 分配 size 字节的内存
     void* allocate(size_t size)
     {
+        total_allocated_bytes += size;
+        current_allocated_bytes += size;
+        current_allocations++;
+        total_allocations++;
         void* p = ::operator new(size);
         return p;
     }
@@ -37,6 +41,8 @@ public:
     // 回收ptr指向的内存。为了记录，提供应当被回收的字节数。
     void deallocate(void* ptr, size_t size)
     {
+        current_allocated_bytes -= size;
+        current_allocations--;
         ::operator delete(ptr);
     }
 
@@ -85,21 +91,21 @@ public:
     // Member types
     using value_type = T;
     using size_type = size_t;
-    using difference_type = size_type;
+    using difference_type = std::ptrdiff_t;
     using propagate_on_container_move_assignment = std::true_type;
 
     // Member functions
     // 分配可容纳n个元素的未初始化连续存储空间。
     [[nodiscard]] constexpr T* allocate(size_type n)
     {
-        return static_cast<T*>(_proxy().allocate(n));
+        return static_cast<T*>(_proxy().allocate(n * sizeof(T)));
     }
     // 分配至少可容纳n个元素，实际上可容纳不小于n的最小的2的幂个元素的未初始化连续存储空间。
     [[nodiscard]] constexpr allocation_result<T*, size_type>
         allocate_at_least(size_type n)
     {
         size_type actual = std::bit_ceil(n);
-        T* p = static_cast<T*>(_proxy().allocate(actual));
+        T* p = static_cast<T*>(_proxy().allocate(actual * sizeof(T)));
         return { p, actual };
     }
     // 回收p所指示的、可容纳n个元素的存储空间。
@@ -262,9 +268,9 @@ struct allocator_traits
 
     // Member alias templates
     template <typename T>
-    using rebind_alloc = get_rebind_alloc_type<Alloc, T>;
+    using rebind_alloc = typename get_rebind_alloc_type<Alloc, T>::type;
     template <typename T>
-    using rebind_traits = std::allocator_traits<rebind_alloc<T>>;
+    using rebind_traits = allocator_traits<rebind_alloc<T>>;
 
     // Member functions
     // 使用 a 申请 n 个 value_type 类型的元素所需的存储空间
