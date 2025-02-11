@@ -3,38 +3,38 @@
 namespace my
 {
 
-// ½öµ±T¾ßÓĞ¿É½ÓÊÜArgs...ÀàĞÍÊµ²ÎµÄ¹¹Ôìº¯ÊıÊ±·µ»ØÕæ¡£
+// ä»…å½“Tå…·æœ‰å¯æ¥å—Args...ç±»å‹å®å‚çš„æ„é€ å‡½æ•°æ—¶è¿”å›çœŸã€‚
 template <typename T, typename... Args>
 inline constexpr bool is_constructible_v = __is_constructible(T, Args...);
 
 
-/// ½öµ±TÎªvoidÊ±·µ»ØÕæ¡£
+/// ä»…å½“Tä¸ºvoidæ—¶è¿”å›çœŸã€‚
 template <typename T>
 inline constexpr bool is_void_v = false;
 
-template <> // Ìá¹©ÌØ»¯T=void
+template <> // æä¾›ç‰¹åŒ–T=void
 inline constexpr bool is_void_v<void> = true;
-template <> // Ìá¹©ÌØ»¯T=c void
+template <> // æä¾›ç‰¹åŒ–T=c void
 inline constexpr bool is_void_v<const void> = true;
-template <> // Ìá¹©ÌØ»¯T=v void
+template <> // æä¾›ç‰¹åŒ–T=v void
 inline constexpr bool is_void_v<volatile void> = true;
-template <> // Ìá¹©ÌØ»¯T=cv void
+template <> // æä¾›ç‰¹åŒ–T=cv void
 inline constexpr bool is_void_v<const volatile void> = true;
 
 
-/// ½öµ±T1, T2ÊÇÏàÍ¬ÀàĞÍÊ±·µ»ØÕæ¡£¿¼ÂÇCVĞŞÊÎ¡£
+/// ä»…å½“T1, T2æ˜¯ç›¸åŒç±»å‹æ—¶è¿”å›çœŸã€‚è€ƒè™‘CVä¿®é¥°ã€‚
 template <typename T1, typename T2>
 inline constexpr bool is_same_v = false;
 
-template <typename T> // Ìá¹©ÌØ»¯£º½ö´«ÈëÒ»¸öÀàĞÍT
+template <typename T> // æä¾›ç‰¹åŒ–ï¼šä»…ä¼ å…¥ä¸€ä¸ªç±»å‹T
 inline constexpr bool is_same_v<T, T> = true;
 
-/// ½öµ±TÎªTypes...ÖĞÖÚÀàĞÍÖ®Ò»Ê±·µ»ØÕæ¡£Õâ²»ÊÇ±ê×¼¹æ¶¨µÄËã×Ó¡£
-template <typename T, typename... Types> // ÕÛµş±í´ïÊ½ÒÀ´ÎÅĞ¶Ï
+/// ä»…å½“Tä¸ºTypes...ä¸­ä¼—ç±»å‹ä¹‹ä¸€æ—¶è¿”å›çœŸã€‚è¿™ä¸æ˜¯æ ‡å‡†è§„å®šçš„ç®—å­ã€‚
+template <typename T, typename... Types> // æŠ˜å è¡¨è¾¾å¼ä¾æ¬¡åˆ¤æ–­
 inline constexpr bool is_any_of_v = (is_same_v<T, Types> || ...);
 
 
-/// ·µ»Ø¶ÔÓ¦µÄ´øÓĞconstĞŞÊÎµÄÀàĞÍ¡£
+/// è¿”å›å¯¹åº”çš„å¸¦æœ‰constä¿®é¥°çš„ç±»å‹ã€‚
 template <typename T>
 struct add_const {
     using type = const T;
@@ -43,13 +43,13 @@ struct add_const {
 template <typename T>
 using add_const_t = add_const<T>::type;
 
-/// ·µ»Ø¶ÔÓ¦µÄ²»´øÓĞconstĞŞÊÎµÄÀàĞÍ¡£
+/// è¿”å›å¯¹åº”çš„ä¸å¸¦æœ‰constä¿®é¥°çš„ç±»å‹ã€‚
 template <typename T>
 struct remove_const {
     using type = T;
 };
 
-// ¶Ô´øcĞŞÊÎÀàĞÍÌØ»¯
+// å¯¹å¸¦cä¿®é¥°ç±»å‹ç‰¹åŒ–
 template <typename T>
 struct remove_const<const T> {
     using type = T;
@@ -58,13 +58,13 @@ struct remove_const<const T> {
 template <typename T>
 using remove_const_t = remove_const<T>::type;
 
-/// ·µ»Ø¶ÔÓ¦µÄ²»´øÓĞCVĞŞÊÎµÄÀàĞÍ¡£
+/// è¿”å›å¯¹åº”çš„ä¸å¸¦æœ‰CVä¿®é¥°çš„ç±»å‹ã€‚
 template <typename T>
 struct remove_cv {
     using type = remove_const<T>::type;
 };
 
-// ¶Ô´øvĞŞÊÎÀàĞÍÌØ»¯£¬¸´ÓÃremoveconst
+// å¯¹å¸¦vä¿®é¥°ç±»å‹ç‰¹åŒ–ï¼Œå¤ç”¨removeconst
 template <typename T>
 struct remove_cv<volatile T> {
     using type = remove_const<T>::type;
@@ -73,34 +73,34 @@ struct remove_cv<volatile T> {
 template <typename T>
 using remove_cv_t = remove_cv<T>::type;
 
-/// ½öµ±TÎª²¼¶ûÀàĞÍ¡¢×Ö·ûÀàĞÍ¡¢ÕûÊıÀàĞÍÊ±·µ»ØÕæ¡£
+/// ä»…å½“Tä¸ºå¸ƒå°”ç±»å‹ã€å­—ç¬¦ç±»å‹ã€æ•´æ•°ç±»å‹æ—¶è¿”å›çœŸã€‚
 template <typename T>
 inline constexpr bool is_integral_v = false;
 
 template <typename T> requires is_any_of_v<remove_cv_t<T>, bool, int, short, long, long long, char, unsigned short, unsigned, unsigned long, unsigned long long, unsigned char, signed char, wchar_t, char8_t, char16_t, char32_t>
 inline constexpr bool is_integral_v<T> = true;
 
-/// ½öµ±T¾ßÓĞ¶¥²ãvolatileĞŞÊÎÊ±·µ»ØÕæ¡£
+/// ä»…å½“Tå…·æœ‰é¡¶å±‚volatileä¿®é¥°æ—¶è¿”å›çœŸã€‚
 template <typename T>
 inline constexpr bool is_volatile_v = false;
 
-template <typename T> // Ìá¹©¾ßÓĞ¶¥²ãvĞŞÊÎµÄÌØ»¯
+template <typename T> // æä¾›å…·æœ‰é¡¶å±‚vä¿®é¥°çš„ç‰¹åŒ–
 inline constexpr bool is_volatile_v<volatile T> = true;
 
-/// ½öµ±TÎªÖ¸ÕëÊ±·µ»ØÕæ¡£
+/// ä»…å½“Tä¸ºæŒ‡é’ˆæ—¶è¿”å›çœŸã€‚
 template <typename T>
 inline constexpr bool is_pointer_v = false;
 
-template <typename T> // Ìá¹©¿É½âÎöÎªÖ¸ÕëÀàĞÍµÄÌØ»¯
+template <typename T> // æä¾›å¯è§£æä¸ºæŒ‡é’ˆç±»å‹çš„ç‰¹åŒ–
 inline constexpr bool is_pointer_v<T*> = true;
 
-template <typename T> // Ìá¹©¿É½âÎöÎªÖ¸ÕëÀàĞÍµÄÌØ»¯
+template <typename T> // æä¾›å¯è§£æä¸ºæŒ‡é’ˆç±»å‹çš„ç‰¹åŒ–
 inline constexpr bool is_pointer_v<T* const> = true;
 
-template <typename T> // Ìá¹©¿É½âÎöÎªÖ¸ÕëÀàĞÍµÄÌØ»¯
+template <typename T> // æä¾›å¯è§£æä¸ºæŒ‡é’ˆç±»å‹çš„ç‰¹åŒ–
 inline constexpr bool is_pointer_v<T* volatile> = true;
 
-/// ½öµ±TÎªÒıÓÃÊ±·µ»ØÕæ¡£
+/// ä»…å½“Tä¸ºå¼•ç”¨æ—¶è¿”å›çœŸã€‚
 template <typename T>
 inline constexpr bool is_reference_v = false;
 
@@ -110,18 +110,18 @@ inline constexpr bool is_reference_v<T&> = true;
 template <typename T>
 inline constexpr bool is_reference_v<T&&> = true;
 
-/// ½öµ±TÎªº¯ÊıÊ±·µ»ØÕæ¡£ÌáÊ¾£ºÖ»ÓĞUÎªº¯Êı»òÒıÓÃÊ±£¬is_const_v<const U>·µ»Ø¼Ù¡£
+/// ä»…å½“Tä¸ºå‡½æ•°æ—¶è¿”å›çœŸã€‚æç¤ºï¼šåªæœ‰Uä¸ºå‡½æ•°æˆ–å¼•ç”¨æ—¶ï¼Œis_const_v<const U>è¿”å›å‡ã€‚
 template <typename T>
 inline constexpr bool is_function_v = false;
 
 template <typename Ret, typename... Args>
 inline constexpr bool is_function_v<Ret(Args...)> = true;
 
-/// ½öµ±TÎª³ıÁËvoid¡¢º¯Êı¡¢ÒıÓÃÒÔÍâµÄÈÎºÎÀàĞÍÊ±·µ»ØÕæ¡£
+/// ä»…å½“Tä¸ºé™¤äº†voidã€å‡½æ•°ã€å¼•ç”¨ä»¥å¤–çš„ä»»ä½•ç±»å‹æ—¶è¿”å›çœŸã€‚
 template <typename T>
 inline constexpr bool is_object_v = !(is_any_of_v<T, void> || is_function_v<T> || is_reference_v<T>);
 
-/// ½öµ±TÎªÔ­ÉúÊı×éÊ±·µ»ØÕæ¡£
+/// ä»…å½“Tä¸ºåŸç”Ÿæ•°ç»„æ—¶è¿”å›çœŸã€‚
 template <typename T>
 inline constexpr bool is_array_v = false;
 
@@ -131,31 +131,31 @@ inline constexpr bool is_array_v<T[N]> = true;
 template <typename T>
 inline constexpr bool is_array_v<T[]> = true;
 
-/// ½öµ±TÄÜÍê³ÉÄ¬ÈÏ¹¹ÔìÊ±·µ»ØÕæ¡£
+/// ä»…å½“Tèƒ½å®Œæˆé»˜è®¤æ„é€ æ—¶è¿”å›çœŸã€‚
 template <typename T>
 inline constexpr bool is_default_constructible_v = is_constructible_v<T>;
 
-/// ½öµ±TÄÜÍê³É¿½±´¹¹ÔìÊ±·µ»ØÕæ¡£
+/// ä»…å½“Tèƒ½å®Œæˆæ‹·è´æ„é€ æ—¶è¿”å›çœŸã€‚
 template <typename T>
 inline constexpr bool is_copy_constructible_v = is_constructible_v<T, const T&>;
 
-/// ½öµ±TÄÜÍê³ÉÒÆ¶¯¹¹ÔìÊ±·µ»ØÕæ¡£
+/// ä»…å½“Tèƒ½å®Œæˆç§»åŠ¨æ„é€ æ—¶è¿”å›çœŸã€‚
 template <typename T>
 inline constexpr bool is_move_constructible_v = is_constructible_v<T, T&&>;
 
-/// ·µ»Ø¶ÔÓ¦µÄ·ÇÒıÓÃÀàĞÍ¡£
+/// è¿”å›å¯¹åº”çš„éå¼•ç”¨ç±»å‹ã€‚
 template <typename T>
 struct remove_reference {
     using type = T;
 };
 
-// ¶Ô×óÖµÒıÓÃÌØ»¯
+// å¯¹å·¦å€¼å¼•ç”¨ç‰¹åŒ–
 template <typename T>
 struct remove_reference<T&> {
     using type = T;
 };
 
-// ¶ÔÓÒÖµÒıÓÃ£¨´Ë´¦²»ÊÇÍòÄÜÒıÓÃ£©ÌØ»¯
+// å¯¹å³å€¼å¼•ç”¨ï¼ˆæ­¤å¤„ä¸æ˜¯ä¸‡èƒ½å¼•ç”¨ï¼‰ç‰¹åŒ–
 template <typename T>
 struct remove_reference<T&&> {
     using type = T;
@@ -164,19 +164,19 @@ struct remove_reference<T&&> {
 template <typename T>
 using remove_reference_t = remove_reference<T>::type;
 
-/// ·µ»Ø¶ÔÓ¦µÄ×óÖµÒıÓÃÀàĞÍ¡£ÊÊÓÃÒıÓÃÕÛµş¹æÔò¡£
+/// è¿”å›å¯¹åº”çš„å·¦å€¼å¼•ç”¨ç±»å‹ã€‚é€‚ç”¨å¼•ç”¨æŠ˜å è§„åˆ™ã€‚
 template <typename T>
 using add_lvalue_reference_t = T&;
 
-/// ·µ»Ø¶ÔÓ¦µÄÓÒÖµÒıÓÃÀàĞÍ¡£ÊÊÓÃÒıÓÃÕÛµş¹æÔò¡£
+/// è¿”å›å¯¹åº”çš„å³å€¼å¼•ç”¨ç±»å‹ã€‚é€‚ç”¨å¼•ç”¨æŠ˜å è§„åˆ™ã€‚
 template <typename T>
 using add_rvalue_reference_t = T&&;
 
-/// ·µ»Ø¶ÔÓ¦µÄ·ÇÒıÓÃÀàĞÍµÄÖ¸Õë¡£
+/// è¿”å›å¯¹åº”çš„éå¼•ç”¨ç±»å‹çš„æŒ‡é’ˆã€‚
 template <typename T>
 using add_pointer_t = remove_reference_t<T>*;
 
-/// ·µ»ØÊı×éTµÄÎ¬¶È£¬Èô·ÇÊı×é·µ»Ø0¡£
+/// è¿”å›æ•°ç»„Tçš„ç»´åº¦ï¼Œè‹¥éæ•°ç»„è¿”å›0ã€‚
 template <typename T>
 inline constexpr size_t rank_v = 0;
 
@@ -186,7 +186,7 @@ inline constexpr size_t rank_v<T[]> = rank_v<T> + 1;
 template <typename T, size_t N>
 inline constexpr size_t rank_v<T[N]> = rank_v<T> + 1;
 
-/// ·µ»ØÊı×éTÔÚµÚI¸öÎ¬¶ÈÉÏµÄ´óĞ¡¡£
+/// è¿”å›æ•°ç»„Tåœ¨ç¬¬Iä¸ªç»´åº¦ä¸Šçš„å¤§å°ã€‚
 template <typename T, size_t I>
 inline constexpr size_t extent_v = 0;
 
@@ -199,7 +199,7 @@ inline constexpr size_t extent_v<T[N], I> = extent_v<T, I - 1>;
 template <typename T, size_t N>
 inline constexpr size_t extent_v<T[N], 0> = N;
 
-/// »ñÈ¡Êı×éTµÄÔªËØµÄÀàĞÍ¡£Èô·ÇÊı×é·µ»ØÆä±¾Éí¡£
+/// è·å–æ•°ç»„Tçš„å…ƒç´ çš„ç±»å‹ã€‚è‹¥éæ•°ç»„è¿”å›å…¶æœ¬èº«ã€‚
 template <typename T>
 struct remove_extent {
     using type = T;
@@ -218,7 +218,7 @@ struct remove_extent<T[N]> {
 template <typename T>
 using remove_extent_t = remove_extent<T>::type;
 
-/// µ± B == true Ê±·µ»Ø T£¬·ñÔò·µ»Ø F¡£
+/// å½“ B == true æ—¶è¿”å› Tï¼Œå¦åˆ™è¿”å› Fã€‚
 template <bool B, typename T, typename F>
 struct conditional {
     using type = void;
@@ -238,7 +238,7 @@ struct conditional<false, T, F> {
 template <bool B, typename T, typename F>
 using conditional_t = conditional<B, T, F>::type;
 
-/// ·µ»ØTµÄÍË»¯ÀàĞÍ¡£
+/// è¿”å›Tçš„é€€åŒ–ç±»å‹ã€‚
 template <typename T>
 struct decay { using type = remove_cv_t<T>; };
 

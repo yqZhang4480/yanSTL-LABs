@@ -27,7 +27,7 @@ public:
         return instance;
     }
 
-    // ·ÖÅä size ×Ö½ÚµÄÄÚ´æ
+    // åˆ†é… size å­—èŠ‚çš„å†…å­˜
     void* allocate(size_t size)
     {
         total_allocated_bytes += size;
@@ -38,7 +38,7 @@ public:
         return p;
     }
 
-    // »ØÊÕptrÖ¸ÏòµÄÄÚ´æ¡£ÎªÁË¼ÇÂ¼£¬Ìá¹©Ó¦µ±±»»ØÊÕµÄ×Ö½ÚÊı¡£
+    // å›æ”¶ptræŒ‡å‘çš„å†…å­˜ã€‚ä¸ºäº†è®°å½•ï¼Œæä¾›åº”å½“è¢«å›æ”¶çš„å­—èŠ‚æ•°ã€‚
     void deallocate(void* ptr, size_t size)
     {
         current_allocated_bytes -= size;
@@ -55,10 +55,10 @@ public:
         reset_uncheck();
     }
 
-    size_t current_allocated_bytes; // µ±Ç°ÒÑ·ÖÅäÎ´»ØÊÕµÄ×Ö½ÚÊı
-    size_t total_allocated_bytes;   // ×Ü¹²ÒÑ·ÖÅäµÄ×Ö½ÚÊı
-    size_t current_allocations;     // ÉĞÎ´»ØÊÕµÄ·ÖÅäÊı£¨:= allocateÓëdeallocateµÄµ÷ÓÃ´ÎÊıÖ®²î£©
-    size_t total_allocations;       // ×Ü¹²ÒÑ·ÖÅäµÄ·ÖÅäÊı £¨:= allocateµÄµ÷ÓÃ´ÎÊı£©
+    size_t current_allocated_bytes; // å½“å‰å·²åˆ†é…æœªå›æ”¶çš„å­—èŠ‚æ•°
+    size_t total_allocated_bytes;   // æ€»å…±å·²åˆ†é…çš„å­—èŠ‚æ•°
+    size_t current_allocations;     // å°šæœªå›æ”¶çš„åˆ†é…æ•°ï¼ˆ:= allocateä¸deallocateçš„è°ƒç”¨æ¬¡æ•°ä¹‹å·®ï¼‰
+    size_t total_allocations;       // æ€»å…±å·²åˆ†é…çš„åˆ†é…æ•° ï¼ˆ:= allocateçš„è°ƒç”¨æ¬¡æ•°ï¼‰
 
     void reset_uncheck()
     {
@@ -95,12 +95,12 @@ public:
     using propagate_on_container_move_assignment = std::true_type;
 
     // Member functions
-    // ·ÖÅä¿ÉÈİÄÉn¸öÔªËØµÄÎ´³õÊ¼»¯Á¬Ğø´æ´¢¿Õ¼ä¡£
+    // åˆ†é…å¯å®¹çº³nä¸ªå…ƒç´ çš„æœªåˆå§‹åŒ–è¿ç»­å­˜å‚¨ç©ºé—´ã€‚
     [[nodiscard]] constexpr T* allocate(size_type n)
     {
         return static_cast<T*>(_proxy().allocate(n * sizeof(T)));
     }
-    // ·ÖÅäÖÁÉÙ¿ÉÈİÄÉn¸öÔªËØ£¬Êµ¼ÊÉÏ¿ÉÈİÄÉ²»Ğ¡ÓÚnµÄ×îĞ¡µÄ2µÄÃİ¸öÔªËØµÄÎ´³õÊ¼»¯Á¬Ğø´æ´¢¿Õ¼ä¡£
+    // åˆ†é…è‡³å°‘å¯å®¹çº³nä¸ªå…ƒç´ ï¼Œå®é™…ä¸Šå¯å®¹çº³ä¸å°äºnçš„æœ€å°çš„2çš„å¹‚ä¸ªå…ƒç´ çš„æœªåˆå§‹åŒ–è¿ç»­å­˜å‚¨ç©ºé—´ã€‚
     [[nodiscard]] constexpr allocation_result<T*, size_type>
         allocate_at_least(size_type n)
     {
@@ -108,13 +108,13 @@ public:
         T* p = static_cast<T*>(_proxy().allocate(actual * sizeof(T)));
         return { p, actual };
     }
-    // »ØÊÕpËùÖ¸Ê¾µÄ¡¢¿ÉÈİÄÉn¸öÔªËØµÄ´æ´¢¿Õ¼ä¡£
+    // å›æ”¶pæ‰€æŒ‡ç¤ºçš„ã€å¯å®¹çº³nä¸ªå…ƒç´ çš„å­˜å‚¨ç©ºé—´ã€‚
     constexpr void deallocate(T* p, size_type n)
     {
         _proxy().deallocate(p, n * sizeof(T));
     }
 
-    // ÅĞ¶ÏÍ¬Ò»ÀàÄ£°å¶¨ÒåµÄ¸÷·ÖÅäÆ÷ÊµÀıÀàĞÍµÄÁ½¸ö¶ÔÏóÊÇ·ñÏàµÈ¡£
+    // åˆ¤æ–­åŒä¸€ç±»æ¨¡æ¿å®šä¹‰çš„å„åˆ†é…å™¨å®ä¾‹ç±»å‹çš„ä¸¤ä¸ªå¯¹è±¡æ˜¯å¦ç›¸ç­‰ã€‚
     template<typename U>
     constexpr bool operator==(const allocator<U>&) const noexcept
     {
@@ -273,13 +273,13 @@ struct allocator_traits
     using rebind_traits = allocator_traits<rebind_alloc<T>>;
 
     // Member functions
-    // Ê¹ÓÃ a ÉêÇë n ¸ö value_type ÀàĞÍµÄÔªËØËùĞèµÄ´æ´¢¿Õ¼ä
+    // ä½¿ç”¨ a ç”³è¯· n ä¸ª value_type ç±»å‹çš„å…ƒç´ æ‰€éœ€çš„å­˜å‚¨ç©ºé—´
     [[nodiscard]] static constexpr pointer allocate(Alloc& a, size_type n)
     {
         return a.allocate(n);
     }
 
-    // ÉêÇë´øÌáÊ¾µÄÄÚ´æ£¨Èç¹û allocator Ã»ÓĞ¸Ã·½·¨£¬Ôòµ÷ÓÃÎŞÌáÊ¾µÄ allocate£©
+    // ç”³è¯·å¸¦æç¤ºçš„å†…å­˜ï¼ˆå¦‚æœ allocator æ²¡æœ‰è¯¥æ–¹æ³•ï¼Œåˆ™è°ƒç”¨æ— æç¤ºçš„ allocateï¼‰
     [[nodiscard]] static constexpr pointer allocate(Alloc& a, size_type n, const_void_pointer hint)
     {
         pointer p;
@@ -294,7 +294,7 @@ struct allocator_traits
         return p;
     }
 
-    // ·ÖÅäÖÁÉÙ¿ÉÈİÄÉn¸öÔªËØµÄÎ´³õÊ¼»¯Á¬Ğø´æ´¢¿Õ¼ä¡£Ä¬ÈÏ·µ»Ø{a.allocate(n), n}¡£
+    // åˆ†é…è‡³å°‘å¯å®¹çº³nä¸ªå…ƒç´ çš„æœªåˆå§‹åŒ–è¿ç»­å­˜å‚¨ç©ºé—´ã€‚é»˜è®¤è¿”å›{a.allocate(n), n}ã€‚
     [[nodiscard]] static constexpr allocation_result<pointer, size_type>
         allocate_at_least(Alloc& a, size_type n)
     {
@@ -308,13 +308,13 @@ struct allocator_traits
         }
     }
 
-    // ÊÍ·ÅÄÚ´æ
+    // é‡Šæ”¾å†…å­˜
     static constexpr void deallocate(Alloc& a, pointer p, size_type n)
     {
         a.deallocate(p, n);
     }
 
-    // ÔÚÄÚ´æÉÏ¹¹Ôì¶ÔÏó
+    // åœ¨å†…å­˜ä¸Šæ„é€ å¯¹è±¡
     template <typename T, typename... Args>
     static constexpr void construct(Alloc& a, T* p, Args&&... args)
     {
@@ -328,7 +328,7 @@ struct allocator_traits
         }
     }
 
-    // Ïú»Ù¶ÔÏó
+    // é”€æ¯å¯¹è±¡
     template <typename T>
     static constexpr void destroy(Alloc& a, T* p)
     {
@@ -342,7 +342,7 @@ struct allocator_traits
         }
     }
 
-    // »ñÈ¡×î´ó¿É·ÖÅäµÄÔªËØÊıÁ¿
+    // è·å–æœ€å¤§å¯åˆ†é…çš„å…ƒç´ æ•°é‡
     static constexpr size_type max_size(const Alloc& a) noexcept
     {
         if constexpr (requires (Alloc aa) { aa.max_size(); })
@@ -355,8 +355,8 @@ struct allocator_traits
         }
     }
 
-    // µ÷ÓÃaµÄselect_on_container_copy_constructionº¯Êı¡£
-    // ÈôAllocÎ´ÊµÏÖ¸Ãº¯Êı£¬Ôò·µ»Øa¡£¾ßÌåº¬Òå½«ÔÚºóĞøÊµÑéÉî¾¿¡£
+    // è°ƒç”¨açš„select_on_container_copy_constructionå‡½æ•°ã€‚
+    // è‹¥Allocæœªå®ç°è¯¥å‡½æ•°ï¼Œåˆ™è¿”å›aã€‚å…·ä½“å«ä¹‰å°†åœ¨åç»­å®éªŒæ·±ç©¶ã€‚
     static constexpr Alloc select_on_container_copy_construction(const Alloc& a)
     {
         if constexpr (requires (Alloc aa) { aa.select_on_container_copy_construction(); })

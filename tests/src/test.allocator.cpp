@@ -178,58 +178,58 @@ case_t allocator_test()
 case_t allocator_traits_types()
 {
     using T = NAMESPACE_MY allocator_traits<std::allocator<int>>;
-    co_yield std::format("test with T = {}", typename_<T>());
+    co_yield std::format("test with T = `{}`", typename_<T>());
     co_yield{ std::is_same_v<typename T::value_type, int>,
-               std::format("T::value_type should be int, but is {}", typename_<typename T::value_type>()) };
+               std::format("T::value_type should be int, but is `{}`", typename_<typename T::value_type>()) };
     co_yield{ std::is_same_v<typename T::pointer, int*>,
-               std::format("T::pointer should be int*, but is {}", typename_<typename T::pointer>()) };
+               std::format("T::pointer should be int*, but is `{}`", typename_<typename T::pointer>()) };
     co_yield{ std::is_same_v<typename T::const_pointer, const int*>,
-               std::format("T::const_pointer should be const int*, but is {}", typename_<typename T::const_pointer>()) };
+               std::format("T::const_pointer should be const int*, but is `{}`", typename_<typename T::const_pointer>()) };
     co_yield{ std::is_same_v<typename T::void_pointer, void*>,
-               std::format("T::void_pointer should be void*, but is {}", typename_<typename T::void_pointer>()) };
+               std::format("T::void_pointer should be void*, but is `{}`", typename_<typename T::void_pointer>()) };
     co_yield{ std::is_same_v<typename T::const_void_pointer, const void*>,
-               std::format("T::const_void_pointer should be const void*, but is {}", typename_<typename T::const_void_pointer>()) };
+               std::format("T::const_void_pointer should be const void*, but is `{}`", typename_<typename T::const_void_pointer>()) };
     co_yield{ std::is_same_v<typename T::difference_type, std::ptrdiff_t>,
-               std::format("T::difference_type should be std::ptrdiff_t, but is {}", typename_<typename T::difference_type>()) };
+               std::format("T::difference_type should be std::ptrdiff_t, but is `{}`", typename_<typename T::difference_type>()) };
     co_yield{ std::is_same_v<typename T::size_type, std::size_t>,
-               std::format("T::size_type should be std::size_t, but is {}", typename_<typename T::size_type>()) };
+               std::format("T::size_type should be std::size_t, but is `{}`", typename_<typename T::size_type>()) };
     co_yield{ std::is_same_v<typename T::propagate_on_container_copy_assignment, std::false_type>,
-               std::format("T::propagate_on_container_copy_assignment should be std::false_type, but is {}", typename_<typename T::propagate_on_container_copy_assignment>()) };
+               std::format("T::propagate_on_container_copy_assignment should be std::false_type, but is `{}`", typename_<typename T::propagate_on_container_copy_assignment>()) };
     co_yield{ std::is_same_v<typename T::propagate_on_container_move_assignment, std::true_type>,
-               std::format("T::propagate_on_container_move_assignment should be std::true_type, but is {}", typename_<typename T::propagate_on_container_move_assignment>()) };
+               std::format("T::propagate_on_container_move_assignment should be std::true_type, but is `{}`", typename_<typename T::propagate_on_container_move_assignment>()) };
     co_yield{ std::is_same_v<typename T::propagate_on_container_swap, std::false_type>,
-               std::format("T::propagate_on_container_swap should be std::false_type, but is {}", typename_<typename T::propagate_on_container_swap>()) };
+               std::format("T::propagate_on_container_swap should be std::false_type, but is `{}`", typename_<typename T::propagate_on_container_swap>()) };
     co_yield{ std::is_same_v<typename T::is_always_equal, std::true_type>,
-               std::format("T::is_always_equal should be std::true_type, but is {}", typename_<typename T::is_always_equal>()) };
+               std::format("T::is_always_equal should be std::true_type, but is `{}`", typename_<typename T::is_always_equal>()) };
     co_yield{ std::is_same_v<typename T::template rebind_alloc<double>, std::allocator<double>>,
-               std::format("T::rebind_alloc<double> should be std::allocator<double>, but is {}", typename_<typename T::template rebind_alloc<double>>()) };
+               std::format("T::rebind_alloc<double> should be std::allocator<double>, but is `{}`", typename_<typename T::template rebind_alloc<double>>()) };
     co_yield{ std::is_same_v<typename T::template rebind_traits<double>, NAMESPACE_MY allocator_traits<std::allocator<double>>>,
-               std::format("T::rebind_traits<double> should be my::allocator_traits<std::allocator<double>>, but is {}", typename_<NAMESPACE_MY allocator_traits<std::allocator<double>>>()) };
+               std::format("T::rebind_traits<double> should be my::allocator_traits<std::allocator<double>>, but is `{}`", typename_<NAMESPACE_MY allocator_traits<std::allocator<double>>>()) };
     co_yield nullptr;
     using U = std::allocator_traits<NAMESPACE_MY allocator<int>>;
-    co_yield std::format("test with U = {}", typename_<U>());
+    co_yield std::format("test with U = `{}`", typename_<U>());
     co_yield{ std::is_same_v<typename U::value_type, int>,
-               std::format("U::value_type should be int, but is {}", typename_<typename U::value_type>()) };
+               std::format("U::value_type should be int, but is `{}`", typename_<typename U::value_type>()) };
     co_yield{ std::is_same_v<typename U::pointer, int*>,
-               std::format("U::pointer should be int*, but is {}", typename_<typename U::pointer>()) };
+               std::format("U::pointer should be int*, but is `{}`", typename_<typename U::pointer>()) };
     co_yield{ std::is_same_v<typename U::const_pointer, const int*>,
-               std::format("U::const_pointer should be const int*, but is {}", typename_<typename U::const_pointer>()) };
+               std::format("U::const_pointer should be const int*, but is `{}`", typename_<typename U::const_pointer>()) };
     co_yield{ std::is_same_v<typename U::void_pointer, void*>,
-               std::format("U::void_pointer should be void*, but is {}", typename_<typename U::void_pointer>()) };
+               std::format("U::void_pointer should be void*, but is `{}`", typename_<typename U::void_pointer>()) };
     co_yield{ std::is_same_v<typename U::const_void_pointer, const void*>,
-               std::format("U::const_void_pointer should be const void*, but is {}", typename_<typename U::const_void_pointer>()) };
+               std::format("U::const_void_pointer should be const void*, but is `{}`", typename_<typename U::const_void_pointer>()) };
     co_yield{ std::is_same_v<typename U::difference_type, std::ptrdiff_t>,
-               std::format("U::difference_type should be std::ptrdiff_t, but is {}", typename_<typename U::difference_type>()) };
+               std::format("U::difference_type should be std::ptrdiff_t, but is `{}`", typename_<typename U::difference_type>()) };
     co_yield{ std::is_same_v<typename U::size_type, std::size_t>,
-               std::format("U::size_type should be std::size_t, but is {}", typename_<typename U::size_type>()) };
+               std::format("U::size_type should be std::size_t, but is `{}`", typename_<typename U::size_type>()) };
     co_yield{ std::is_same_v<typename U::propagate_on_container_copy_assignment, std::false_type>,
-               std::format("U::propagate_on_container_copy_assignment should be std::false_type, but is {}", typename_<typename U::propagate_on_container_copy_assignment>()) };
+               std::format("U::propagate_on_container_copy_assignment should be std::false_type, but is `{}`", typename_<typename U::propagate_on_container_copy_assignment>()) };
     co_yield{ std::is_same_v<typename U::propagate_on_container_move_assignment, std::true_type>,
-               std::format("U::propagate_on_container_move_assignment should be std::true_type, but is {}", typename_<typename U::propagate_on_container_move_assignment>()) };
+               std::format("U::propagate_on_container_move_assignment should be std::true_type, but is `{}`", typename_<typename U::propagate_on_container_move_assignment>()) };
     co_yield{ std::is_same_v<typename U::propagate_on_container_swap, std::false_type>,
-               std::format("U::propagate_on_container_swap should be std::false_type, but is {}", typename_<typename U::propagate_on_container_swap>()) };
+               std::format("U::propagate_on_container_swap should be std::false_type, but is `{}`", typename_<typename U::propagate_on_container_swap>()) };
     co_yield{ std::is_same_v<typename U::is_always_equal, std::true_type>,
-              std::format("U::is_always_equal should be std::true_type, but is {}", typename_<typename U::is_always_equal>()) };
+              std::format("U::is_always_equal should be std::true_type, but is `{}`", typename_<typename U::is_always_equal>()) };
     co_return;
 }
 

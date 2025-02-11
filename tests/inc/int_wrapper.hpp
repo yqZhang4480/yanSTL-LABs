@@ -54,10 +54,13 @@ public:
         return *this;
     }
 
+    friend bool operator==(const int_wrapper& a, const int_wrapper& b) { return a.value_ == b.value_; }
+    friend bool operator==(const int& a, const int_wrapper& b) { return a == b.value_; }
+    friend bool operator==(const int_wrapper& a, const int& b) { return a.value_ == b; }
+
     ~int_wrapper() { --current_object_count; }
 
     operator int () { return value_; }
-    operator int& () { return value_; }
 private:
     int value_;
 };

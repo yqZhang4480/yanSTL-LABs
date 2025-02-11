@@ -25,7 +25,7 @@ public:
 
     enum class state
     {
-        INITIALIZED, FAILED, PASSED, TIMEOUT
+        INITIALIZED, FAILED, PASSED, TIMEOUT, DISMISSED
     };
 
     struct promise_type
@@ -62,8 +62,14 @@ public:
         inline auto yield_value(const std::pair<bool, std::string>& check_result)
         {
             this->error_message = check_result.second;
-            this->state = state::FAILED; // not suspend if check succeed
+            this->state = state::FAILED;
             return check_awaiter{ check_result.first };
+        }
+        inline auto yield_value(const std::pair<case_t::state, std::string>& set_state)
+        {
+            this->error_message = set_state.second;
+            this->state = set_state.first;
+            return std::suspend_always{};
         }
         inline auto initial_suspend() noexcept
         {
@@ -134,14 +140,14 @@ public:
     inline ~test()
     {
         std::cerr
-            << std::format("{}/{} cases passed in {:.1f} seconds.",
+            << std::format("\033[33;1m{}/{} cases passed in {:.1f} seconds.\033[0m",
                 _passed_cases, _total_cases, _duration * 1. / 1000)
             << std::endl;
     }
     inline auto&& new_case(case_t&& t, std::string name, testing_duration time_limit = 3000)
     {
         ++_total_cases;
-        std::cerr << std::format("Test {}: {}", _total_cases, name);
+        std::cerr << std::format("\033[33mTest {}: {}\033[0m", _total_cases, name);
         std::chrono::system_clock clock;
         auto start = clock.now();
 
@@ -152,9 +158,8 @@ public:
                 switch (state)
                 {
                 case my::test::case_t::state::FAILED:
-                    goto out;
-                    break;
                 case my::test::case_t::state::PASSED:
+                case my::test::case_t::state::DISMISSED:
                     goto out;
                     break;
                 default:
@@ -180,43 +185,56 @@ public:
             state = case_t::state::TIMEOUT;
         }
 
+        std::string state_str;
 
-        std::cerr << (state == case_t::state::PASSED ? " -- passed " : " -- failed ")
-            << std::format("({}ms)", std::chrono::duration_cast<std::chrono::milliseconds>(clock.now() - start).count())
-            << "\n";
-
-        if (state == case_t::state::FAILED)
-        {
-            std::cerr << "\n** Failed **\n" << t.error_message() << "\n";
-        }
-        else if (state == case_t::state::TIMEOUT)
-        {
-            std::cerr << "\n** Timeout **\n";
-        }
-
-        if (state != case_t::state::PASSED)
-        {
-            if (!t.actions().empty())
-            {
-                std::cerr << "\n[Actions]\n"
-                    << t.actions();
-            }
-            if (auto cout_str = t.cout().str(); !cout_str.empty())
-            {
-                std::cerr << "\n[Output]\n"
-                    << cout_str
+        auto print_state = [&state_str, &start, &clock]() {
+                std::cerr << state_str
+                    << std::format("({}ms)", std::chrono::duration_cast<std::chrono::milliseconds>(clock.now() - start).count())
                     << "\n";
-            }
-        }
-        else
+            };
+
+        auto print_debug_info = [&t]() {
+                if (!t.actions().empty())
+                {
+                    std::cerr << "\n[Actions]\n"
+                        << t.actions();
+                }
+                if (auto cout_str = t.cout().str(); !cout_str.empty())
+                {
+                    std::cerr << "\n[Output]\n"
+                        << cout_str
+                        << "\n";
+                }
+            };
+
+        switch (state)
         {
+        case my::test::case_t::state::FAILED:
+            state_str = " --\033[31;1;3m failed \033[0m";
+            print_state();
+            std::cerr << "\n** Failed **\n" << t.error_message() << "\n";
+            print_debug_info();
+            break;
+        case my::test::case_t::state::PASSED:
+            state_str = " --\033[32;1;3m passed \033[0m";
+            print_state();
             _passed_cases++;
-        }
-        std::cerr << std::endl;
-        if (state == case_t::state::TIMEOUT)
-        {
+            break;
+        case my::test::case_t::state::TIMEOUT:
+            state_str = " --\033[31;1;3m failed \033[0m";
+            print_state();
+            std::cerr << "\n** Timeout **\n";
+            print_debug_info();
             exit(1);
+            break;
+        case my::test::case_t::state::DISMISSED:
+            state_str = " --\033[37;1;3m dismissed \033[0m";
+            print_state();
+            break;
+        default:
+            break;
         }
+            std::cerr << std::endl;
 
         return *this;
     }
