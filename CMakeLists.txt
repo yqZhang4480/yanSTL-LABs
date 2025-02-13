@@ -17,6 +17,12 @@ include_directories("tests/inc")
 add_executable(hello "tests/src/test.hello.cpp")
 add_executable(lab1  "tests/src/test.type_traits.cpp")
 add_executable(lab2  "tests/src/test.allocator.cpp")
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_link_libraries(lab1 PRIVATE pthread)
+  target_link_libraries(lab2 PRIVATE pthread)
+endif()
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET hello PROPERTY CXX_STANDARD 20)
