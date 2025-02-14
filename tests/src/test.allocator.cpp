@@ -260,7 +260,7 @@ case_t allocator_with_std_traits()
     using T = std::allocator_traits<Alloc>;
     Alloc alloc;
     ap.reset_uncheck();
-    int_wrapper::reset();
+    auto c = int_wrapper::counter_scope();
     co_yield "allocate raw memory for 5 objects";
     auto* raw_memory = T::allocate(alloc, 5);
 #ifndef USE_STD
@@ -300,7 +300,7 @@ case_t allocator_with_our_traits()
     using T = NAMESPACE_MY allocator_traits<Alloc>;
     Alloc alloc;
     ap.reset_uncheck();
-    int_wrapper::reset();
+    auto c = int_wrapper::counter_scope();
     co_yield "allocate raw memory for 5 objects";
     auto raw_memory = T::allocate(alloc, 5);
 #ifndef USE_STD

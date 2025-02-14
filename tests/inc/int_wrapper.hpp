@@ -8,9 +8,15 @@ namespace my
 
 class int_wrapper {
 public:
+    struct counter_scope {
+        counter_scope() { int_wrapper::reset(); }
+        ~counter_scope() { int_wrapper::reset(); }
+    };
+
     static inline size_t construct_count = 0;
     static inline size_t copy_count = 0;
     static inline size_t move_count = 0;
+    static inline size_t compare_count = 0;
     static inline size_t current_object_count = 0;
 
     static void reset()
@@ -18,6 +24,7 @@ public:
         construct_count = 0;
         copy_count = 0;
         move_count = 0;
+        compare_count = 0;
         current_object_count = 0;
     }
 
@@ -57,6 +64,22 @@ public:
     friend bool operator==(const int_wrapper& a, const int_wrapper& b) { return a.value_ == b.value_; }
     friend bool operator==(const int& a, const int_wrapper& b) { return a == b.value_; }
     friend bool operator==(const int_wrapper& a, const int& b) { return a.value_ == b; }
+
+    friend auto operator<=>(const int_wrapper& a, const int_wrapper& b)
+    {
+        ++int_wrapper::compare_count;
+        return a.value_ <=> b.value_;
+    }
+    friend auto operator<=>(const int& a, const int_wrapper& b)
+    {
+        ++int_wrapper::compare_count;
+        return a <=> b.value_;
+    }
+    friend auto operator<=>(const int_wrapper& a, const int& b)
+    {
+        ++int_wrapper::compare_count;
+        return a.value_ <=> b;
+    }
 
     ~int_wrapper() { --current_object_count; }
 
