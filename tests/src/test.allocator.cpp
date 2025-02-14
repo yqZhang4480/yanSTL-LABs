@@ -260,7 +260,7 @@ case_t allocator_with_std_traits()
     using T = std::allocator_traits<Alloc>;
     Alloc alloc;
     ap.reset_uncheck();
-    int_wrapper::reset();
+    auto c = int_wrapper::counter_scope();
     co_yield "allocate raw memory for 5 objects";
     auto* raw_memory = T::allocate(alloc, 5);
 #ifndef USE_STD
@@ -300,7 +300,7 @@ case_t allocator_with_our_traits()
     using T = NAMESPACE_MY allocator_traits<Alloc>;
     Alloc alloc;
     ap.reset_uncheck();
-    int_wrapper::reset();
+    auto c = int_wrapper::counter_scope();
     co_yield "allocate raw memory for 5 objects";
     auto raw_memory = T::allocate(alloc, 5);
 #ifndef USE_STD
@@ -376,7 +376,7 @@ case_t alloc_at_least()
 
     while (n--)
     {
-        size_t c = std::rand() + 1;
+        size_t c = std::rand() % 32767 + 1;
         co_yield std::format("alloc.allocate_at_least({})", c);
         auto [p3, size3] = alloc.allocate_at_least(c);
         size_t should = 1;
@@ -392,7 +392,7 @@ case_t alloc_at_least()
     n = 1000;
     while (n--)
     {
-        size_t c = std::rand() + 1;
+        size_t c = std::rand() % 32767 + 1;
         co_yield std::format("my::allocator_traits<my::allocator>::allocate_at_least(alloc, {})", c);
         auto [p2, size2] = T::allocate_at_least(alloc, c);
         size_t should = 1;

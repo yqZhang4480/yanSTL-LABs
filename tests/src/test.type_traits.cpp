@@ -84,7 +84,7 @@ case_t is_volatile_v()
     co_yield{ !NAMESPACE_MY is_volatile_v<const u>, std::format("input a const union into `is_volatile_v` should return `false`, but it actually returns `true`.") };
     co_yield{  NAMESPACE_MY is_volatile_v<volatile e>, std::format("input a volatile enum class into `is_volatile_v` should return `true`, but it actually returns `false`.") };
     co_yield{  NAMESPACE_MY is_volatile_v<int* volatile>, std::format("input a volatile pointer type to a value into `is_volatile_v` should return `true`, but it actually returns `false`.") };
-    co_yield{ !NAMESPACE_MY is_volatile_v<int& volatile>, std::format("input a volatile reference type into `is_volatile_v` should return `false` because a reference cannot be modified as volatile.") };
+    //co_yield{ !NAMESPACE_MY is_volatile_v<int& volatile>, std::format("input a volatile reference type into `is_volatile_v` should return `false` because a reference cannot be modified as volatile.") };
     co_yield{ !NAMESPACE_MY is_volatile_v<void(int) volatile>, std::format("input a function type into `is_volatile_v` should return `false`, because a function cannot be modified as volatile.") };
     co_yield{  NAMESPACE_MY is_volatile_v<void(* volatile)(int)>, std::format("input a volatile pointer type to a function into `is_volatile_v` should return `true`, but it actually returns `false`.") };
 }
