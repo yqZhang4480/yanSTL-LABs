@@ -1,8 +1,6 @@
 #pragma once
 
 // 当完成相关实现时，删除对应的宏定义。
-#define DISMISS_UNIQUE_PTR
-#define DISMISS_SHARED_AND_WEAK_PTR
 #define DISMISS_ENABLE_SHARED_FROM_THIS
 
 #include "memory/common.hpp"

@@ -9,12 +9,6 @@ namespace my {
 #ifndef DISMISS_UNIQUE_PTR
 template <typename T, typename Deleter = std::default_delete<T>>
 class unique_ptr;
-
-template <typename T, typename... Args>
-unique_ptr<T> make_unique(Args&&... args);
-
-template <typename T>
-unique_ptr<T[]> make_unique(size_t size);
 #endif
 
 #ifndef DISMISS_SHARED_AND_WEAK_PTR
