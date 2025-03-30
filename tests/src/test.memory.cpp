@@ -2,6 +2,7 @@
 #include "int_wrapper.hpp"
 #include "yan_memory.hpp"
 #include <memory>
+#include <type_traits>
 
 //#define USE_STD
 
@@ -20,7 +21,8 @@ namespace my
     {
 
 template <typename T>
-struct custom_allocator {
+struct custom_allocator
+{
     using value_type = T;
 
     custom_allocator(int* counter = nullptr) : counter(counter) {}
@@ -46,8 +48,93 @@ struct custom_allocator {
 
     int* counter;
 };
-        
 
+case_t unique_ptr_ctor() {
+#ifdef DISMISS_UNIQUE_PTR
+    co_yield { case_t::state::DISMISSED, "test for `unique_ptr` has been dismissed." };
+#else
+    co_yield { noexcept(NAMESPACE_MY unique_ptr<int>()), "Default constructor must be noexcept" };
+    co_yield { noexcept(NAMESPACE_MY unique_ptr<int>(nullptr)), "nullptr_t constructor must be noexcept" };
+    co_yield nullptr;
+
+    struct TrackedDeleter {
+        int copies = 0, moves = 0;
+        void operator()(int*) const {}
+        TrackedDeleter() = default;
+        TrackedDeleter(const TrackedDeleter& d) noexcept : copies(d.copies + 1), moves(d.moves) {}
+        TrackedDeleter(TrackedDeleter&& d) noexcept : copies(d.copies), moves(d.moves + 1) {}
+    };
+
+    TrackedDeleter d1;
+    co_yield{ "unique_ptr<int, TrackedDeleter> p1(new int, d1);" };
+    NAMESPACE_MY unique_ptr<int, TrackedDeleter> p1(new int, d1);
+    co_yield{ p1.get_deleter().copies == 1 && p1.get_deleter().moves == 0, "Deleter should be copied once." };
+    co_yield nullptr;
+
+    co_yield{ "unique_ptr<int, TrackedDeleter> p2(new int, TrackedDeleter{});" };
+    NAMESPACE_MY unique_ptr<int, TrackedDeleter> p2(new int, TrackedDeleter{});
+    co_yield{ p2.get_deleter().copies == 0 && p2.get_deleter().moves == 1, "Deleter should be moved once." };
+    co_yield nullptr;
+    
+    TrackedDeleter d2;
+    co_yield{ "unique_ptr<int, TrackedDeleter&> p3(new int, d2);" };
+    NAMESPACE_MY unique_ptr<int, TrackedDeleter&> p3(new int, d2);
+    co_yield{ &p3.get_deleter() == &d2, "Deleter reference should bind to original object." };
+    co_yield nullptr;
+
+    TrackedDeleter d3;
+    co_yield{ "unique_ptr<int, const TrackedDeleter&> p4(new int, d2);" };
+    NAMESPACE_MY unique_ptr<int, const TrackedDeleter&> p4(new int, d3);
+    co_yield{ &p4.get_deleter() == &d3, "Deleter reference should bind to original object." };
+    co_yield nullptr;
+
+
+    co_yield { noexcept(NAMESPACE_MY unique_ptr<int, TrackedDeleter>(
+        std::declval<NAMESPACE_MY unique_ptr<int, TrackedDeleter>&&>())),
+        "Move constructor should be noexcept" };
+    co_yield { noexcept(NAMESPACE_MY unique_ptr<int, TrackedDeleter&>(
+        std::declval<NAMESPACE_MY unique_ptr<int, TrackedDeleter&>&&>())),
+        "Move constructor should be noexcept" }; 
+    co_yield { noexcept(NAMESPACE_MY unique_ptr<int, const TrackedDeleter&>(
+        std::declval<NAMESPACE_MY unique_ptr<int, const TrackedDeleter&>&&>())),
+        "Move constructor should be noexcept" };
+    co_yield nullptr;
+
+
+    bool base_called = false;
+    bool derived_called = false;
+
+    struct BaseDeleter {
+        bool* b;
+        BaseDeleter(bool* ptr) : b(ptr) {}
+        virtual void operator()(int* p) const {
+            delete p;
+            *b = true;
+        }
+        virtual ~BaseDeleter() = default;
+    };
+    struct DerivedDeleter : BaseDeleter {
+        bool* b;
+        DerivedDeleter(bool* ptr1, bool* ptr2) : BaseDeleter(ptr1), b(ptr2) {}
+        void operator()(int* p) const override {
+            delete p;
+            *b = true;
+        }
+    };
+
+    co_yield{"unique_ptr<int, DerivedDeleter> p6;"};
+    NAMESPACE_MY unique_ptr<int, DerivedDeleter> p6(new int, {&base_called, &derived_called});
+    co_yield{"unique_ptr<int, BaseDeleter> p7(std::move(p6));"};
+    NAMESPACE_MY unique_ptr<int, BaseDeleter> p7(std::move(p6));
+    co_yield{"reset p7."};
+    p7.reset();
+
+    co_yield{ base_called == true && derived_called == false,
+        "Base deleter's operator() should be called due to type casting." };
+    co_yield nullptr;
+#endif
+    co_return;
+}
 
 case_t unique_ptr() {
 #ifdef DISMISS_UNIQUE_PTR
@@ -167,13 +254,61 @@ case_t unique_ptr() {
     }
     co_yield nullptr;
 
-    co_yield "Testing custom deleter...";
     bool deleter_called = false;
-    auto custom_deleter = [&](int* ptr) { delete ptr; deleter_called = true; };
+    struct Deleter {
+        bool* d;
+        Deleter(bool* d) : d(d) {}
+        void operator()(int* ptr) { delete ptr; *d = true; }
+        Deleter(const Deleter& dd) : d(dd.d) {} 
+        Deleter(Deleter&& dd) : d(dd.d) {} 
+        Deleter& operator=(const Deleter& dd) { d = dd.d; return *this; }
+        Deleter& operator=(Deleter&& dd) { d = dd.d; return *this; }
+    };
+    Deleter custom_deleter = &deleter_called;
+    co_yield{ std::is_move_assignable<decltype(custom_deleter)>::value };
     {
-        NAMESPACE_MY unique_ptr<int, decltype(custom_deleter)> p10(new int(99), custom_deleter);
+        co_yield "Create an empty unique_ptr with a custom deleter";
+        NAMESPACE_MY unique_ptr<int, Deleter> p10(nullptr, custom_deleter);
+        co_yield "Going out of scope";
     }
-    co_yield{ deleter_called, std::format("Custom deleter should be called on destruction, but it seems not.") };
+    co_yield{ !deleter_called, std::format("There should be no effects when destory an empty unique_ptr, but actually the deleter has been called.") };
+    {
+        co_yield "Create two empty unique_ptrs with a custom deleter";
+        NAMESPACE_MY unique_ptr<int, decltype(custom_deleter)> p11(nullptr, custom_deleter);
+        co_yield "Move one into another";
+        NAMESPACE_MY unique_ptr<int, decltype(custom_deleter)> p12(nullptr, custom_deleter);
+        co_yield{ !deleter_called, std::format("There should be no effects when construct unique_ptrs, but actually the deleter has been called.") };
+        p11 = std::move(p12);
+        co_yield{ !deleter_called, std::format("There should be no effects when move assigning into an empty unique_ptr, but actually the deleter has been called.") };
+        co_yield "Reset one";
+        p11.reset();
+        co_yield{ !deleter_called, std::format("There should be no effects when reset an empty unique_ptr, but actually the deleter has been called.") };
+        co_yield "Going out of scope";
+    }
+    co_yield{ !deleter_called, std::format("There should be no effects when destory an empty unique_ptr, but actually the deleter has been called.") };
+
+    {
+        co_yield "create an nonempty unique_ptr with a custom deleter";
+        NAMESPACE_MY unique_ptr<int, decltype(custom_deleter)> p11(new int, custom_deleter);
+        co_yield "move it for another unique_ptr's construct";
+        auto p12 = std::move(p11);
+        co_yield{ !deleter_called, std::format("There should be no effects when move a unique_ptr, but actually the deleter has been called.") };
+        co_yield "Going of scope";
+    }
+    co_yield{ deleter_called, std::format("The custom deleter should be called, but it seems not.") };
+    co_yield nullptr;
+
+    {
+        auto s = int_wrapper::counter_scope();
+        auto p = new int_wrapper(77);
+        struct FakeDeleter { void operator()(int_wrapper*) {} };
+        co_yield "unique_ptr<int_wrapper, FakeDeleter> p1(p);";
+        NAMESPACE_MY unique_ptr<int_wrapper, FakeDeleter> p1(p);
+        co_yield "unique_ptr<int_wrapper, TrueDeleter> p2(p);";
+        NAMESPACE_MY unique_ptr<int_wrapper> p2(p);
+
+        co_yield{ p1 == p2, "Two unique_ptr should be equal if their pointers are same, even if their deleter are different." };
+    }    
 
     co_yield nullptr;
 #endif
@@ -512,7 +647,7 @@ case_t enable_shared_from_this() {
 }
 
 case_t type_casting() {
-#ifdef DISMISS_SHARED_AND_WEAK_PTR
+#ifdef DISMISS_TYPE_CASTING
     co_yield { case_t::state::DISMISSED, "type_casting tests dismissed" };
 #else
     struct Base { 
@@ -725,6 +860,7 @@ int main()
 {
     my::test::test t;
     t.new_case(my::test::unique_ptr(), "unique_ptr");
+    t.new_case(my::test::unique_ptr_ctor(), "unique_ptr constructor");
     t.new_case(my::test::shared_ptr(), "shared_ptr");
     t.new_case(my::test::weak_ptr(), "weak_ptr");
     t.new_case(my::test::enable_shared_from_this(), "enable_shared_from_this");

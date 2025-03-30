@@ -4,6 +4,7 @@
 #define DISMISS_UNIQUE_PTR
 #define DISMISS_SHARED_AND_WEAK_PTR
 #define DISMISS_ENABLE_SHARED_FROM_THIS
+#define DISMISS_TYPE_CASTING
 
 #include "memory/common.hpp"
 
