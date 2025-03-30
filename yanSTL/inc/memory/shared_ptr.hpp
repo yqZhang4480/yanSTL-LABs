@@ -27,8 +27,8 @@ private:
     template <typename U>
     friend class enable_shared_from_this;
 
-    T* _ptr;
-    control_block_base* _cb;
+    T* ptr_;
+    control_block_base* cb_;
 };
 
 template <typename T>
@@ -40,8 +40,8 @@ private:
     template <typename U>
     friend class shared_ptr;
 
-    T* _ptr;
-    control_block_base* _cb;
+    T* ptr_;
+    control_block_base* cb_;
 };
 
 #ifndef DISMISS_ENABLE_SHARED_FROM_THIS 
